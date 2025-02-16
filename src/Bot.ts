@@ -48,6 +48,9 @@ export class YoAIClient {
     async setCommands(commands: ICommands[]): Promise<void> {
         await this.client.post("/sendMessage", { commands });
     }
+    async webhookURL(webhookURL: string): Promise<void> {
+        await this.client.post("/webhookURL", { webhookURL });
+    }
 
     async sendPhoto(to: string, text: string, photo: string): Promise<void> {
         if(!fs.existsSync(photo)){
