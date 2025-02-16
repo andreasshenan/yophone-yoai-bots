@@ -1,5 +1,5 @@
 import { AxiosInstance } from "axios";
-import { ICommands } from "./types";
+import { ICommands } from "../types/types";
 /**
  * Represents the context of a message or update.
  */
