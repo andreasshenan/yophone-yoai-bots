@@ -6,10 +6,10 @@
   "homepage": "https://yoai.yophone.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/shenanandreas/yoai-bots"
+    "url": "https://github.com/andreasshenan/yoai-bots"
   },
   "bugs": {
-    "url": "https://github.com/telegraf/telegraf/issues"
+    "url": "https://github.com/andreasshenan/yoai-bots/issues"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
