@@ -1,6 +1,6 @@
 {
   "name": "yophone-yoai-bots",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "type": "commonjs",
   "main": "lib/index.js",
   "homepage": "https://yoai.yophone.com",
