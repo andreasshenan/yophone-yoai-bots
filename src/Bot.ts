@@ -1,7 +1,7 @@
 import axios, {AxiosInstance, CreateAxiosDefaults} from "axios";
 import fs from "fs";
 import FormData from "form-data";
-import {ICommands} from "../types/types";
+import {ICommands, IReplyOption} from "../types/types";
 
 /**
  * Represents the context of a message or update.
@@ -21,6 +21,9 @@ export class Context {
 
     async reply(text: string): Promise<void> {
         return this.yoaiClient.sendMessage(this.sender.id, text);
+    }
+    async replyWithOptions(text: string, options:IReplyOption[] = []): Promise<void> {
+        return this.yoaiClient.sendMessageWithOptions(this.sender.id, text, options);
     }
 
     replyWithPhoto(photo: string): Promise<void> {
@@ -45,11 +48,17 @@ export class YoAIClient {
     async sendMessage(to: string, text: string): Promise<void> {
         await this.client.post("/sendMessage", { to, text });
     }
+    async sendMessageWithOptions(to: string, text: string, options:IReplyOption[] = []): Promise<void> {
+        await this.client.post("/sendMessage", { to, text, options });
+    }
     async setCommands(commands: ICommands[]): Promise<void> {
         await this.client.post("/sendMessage", { commands });
     }
     async webhookURL(webhookURL: string): Promise<void> {
         await this.client.post("/webhookURL", { webhookURL });
+    }
+    async getChannelMember(id: string, userId:string): Promise<void> {
+        await this.client.post("/getChannelMember", { id,  userId});
     }
 
     async sendPhoto(to: string, text: string, photo: string): Promise<void> {
