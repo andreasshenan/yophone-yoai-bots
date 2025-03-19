@@ -34,7 +34,17 @@ myBot.command("photo", async(ctx) => {
 - Purpose: Handles the /photo command sent by the user.
 - Response: Sends the user an image file named "photo.jpg".
 
-4. Bot Initialization
+
+4. Photo Command
+```javascript
+myBot.command("question", async(ctx) => {
+    ctx.replyWithOptions("Write your answer",[{label:"Yes", value:"yes"},{label:"No", value:"no"}])
+})
+```
+- Purpose: Handles the /photo command sent by the user.
+- Response: Sends the user an image file named "photo.jpg".
+
+5. Bot Initialization
 ```javascript
 myBot.start()
 ```
