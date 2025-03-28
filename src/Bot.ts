@@ -1,7 +1,7 @@
-import axios, {AxiosInstance, CreateAxiosDefaults} from "axios";
+import axios, { AxiosInstance, CreateAxiosDefaults } from "axios";
 import fs from "fs";
 import FormData from "form-data";
-import {ICommands, IReplyOption} from "../types/types";
+import { ICommands, IReplyOption } from "../types/types";
 
 /**
  * Represents the context of a message or update.
@@ -12,7 +12,12 @@ export class Context {
     sender: { id: string };
     yoaiClient: YoAIClient;
 
-    constructor(update: any, content: string, sender: { id: string }, yoaiClient: YoAIClient) {
+    constructor(
+        update: any,
+        content: string,
+        sender: { id: string },
+        yoaiClient: YoAIClient
+    ) {
         this.update = update;
         this.content = content || "";
         this.sender = sender;
@@ -22,8 +27,15 @@ export class Context {
     async reply(text: string): Promise<void> {
         return this.yoaiClient.sendMessage(this.sender.id, text);
     }
-    async replyWithOptions(text: string, options:IReplyOption[] = []): Promise<void> {
-        return this.yoaiClient.sendMessageWithOptions(this.sender.id, text, options);
+    async replyWithOptions(
+        text: string,
+        options: IReplyOption[] = []
+    ): Promise<void> {
+        return this.yoaiClient.sendMessageWithOptions(
+            this.sender.id,
+            text,
+            options
+        );
     }
 
     replyWithPhoto(photo: string): Promise<void> {
@@ -48,7 +60,11 @@ export class YoAIClient {
     async sendMessage(to: string, text: string): Promise<void> {
         await this.client.post("/sendMessage", { to, text });
     }
-    async sendMessageWithOptions(to: string, text: string, options:IReplyOption[] = []): Promise<void> {
+    async sendMessageWithOptions(
+        to: string,
+        text: string,
+        options: IReplyOption[] = []
+    ): Promise<void> {
         await this.client.post("/sendMessage", { to, text, options });
     }
     async setCommands(commands: ICommands[]): Promise<void> {
@@ -57,19 +73,19 @@ export class YoAIClient {
     async webhookURL(webhookURL: string): Promise<void> {
         await this.client.post("/webhookURL", { webhookURL });
     }
-    async getChannelMember(id: string, userId:string): Promise<void> {
-        await this.client.post("/getChannelMember", { id,  userId});
+    async getChannelMember(id: string, userId: string): Promise<void> {
+        await this.client.post("/getChannelMember", { id, userId });
     }
 
     async sendPhoto(to: string, text: string, photo: string): Promise<void> {
-        if(!fs.existsSync(photo)){
-            throw "file not found at path " + photo
+        if (!fs.existsSync(photo)) {
+            throw "file not found at path " + photo;
         }
         const fileBuffer = fs.readFileSync(photo);
         const formdata = new FormData();
         formdata.append("to", to);
         formdata.append("text", text);
-        console.log(fileBuffer)
+        console.log(fileBuffer);
         formdata.append("file", fs.createReadStream(photo), photo);
 
         await this.client.post("/sendMessage", formdata, {
@@ -85,7 +101,9 @@ export class YoAIClient {
 }
 
 export class Bot {
-    middlewares: Array<(ctx: Context, next: () => Promise<void>) => Promise<void>>;
+    middlewares: Array<
+        (ctx: Context, next: () => Promise<void>) => Promise<void>
+    >;
     yoaiClient: YoAIClient;
 
     constructor(token: string) {
@@ -127,7 +145,9 @@ export class Bot {
         // Not implemented yet
     }
 
-    use(handler: (ctx: Context, next: () => Promise<void>) => Promise<void>): void {
+    use(
+        handler: (ctx: Context, next: () => Promise<void>) => Promise<void>
+    ): void {
         this.middlewares.push(handler);
     }
 
@@ -152,7 +172,12 @@ export class Bot {
             console.log("Received plain text", messageTextReceived);
         }
 
-        const ctx = new Context(update, messageTextReceived, sender, this.yoaiClient);
+        const ctx = new Context(
+            update,
+            messageTextReceived,
+            sender,
+            this.yoaiClient
+        );
         await this.runMiddlewares(ctx);
     }
 
@@ -187,10 +212,113 @@ export class Bot {
     }
 }
 
+export class Markup {
+    private value: string;
+
+    constructor(value: string = "") {
+        this.value = value;
+    }
+
+    static header(text: string | number | Markup, prefix = "", postfix = "") {
+        return `${prefix}###${text}${postfix}`;
+    }
+    static subheader(
+        text: string | number | Markup,
+        prefix = "",
+        postfix = ""
+    ) {
+        return `${prefix}##${text}${postfix}`;
+    }
+    static bold(text: string | number | Markup, prefix = "", postfix = "") {
+        return `${prefix}**${text}**${postfix}`;
+    }
+    static underline(
+        text: string | number | Markup,
+        prefix = "",
+        postfix = ""
+    ) {
+        return `${prefix}__${text}__${postfix}`;
+    }
+    static italic(text: string | number | Markup, prefix = "", postfix = "") {
+        return `${prefix}*${text}*${postfix}`;
+    }
+    static strike(text: string | number | Markup, prefix = "", postfix = "") {
+        return `${prefix}~~${text}~~${postfix}`;
+    }
+    static copyable(text: string | number | Markup, prefix = "", postfix = "") {
+        return `${prefix}\`${text}\`${postfix}`;
+    }
+    static link(
+        text: string | number | Markup,
+        link: string,
+        prefix = "",
+        postfix = ""
+    ) {
+        return `${prefix}[${text}](${link})${postfix}`;
+    }
+
+    clear() {
+        this.value = "";
+    }
+
+    newLine(count: number = 1) {
+        const line = "\n";
+        this.value = `${this.value}${line.repeat(count)}`;
+        return this;
+    }
+
+    text(text: string | number, prefix = "", postfix = "") {
+        this.value = `${this.value}${prefix}${text}${postfix}`;
+        return this;
+    }
+
+    header(text: string, prefix = "", postfix = "") {
+        this.value = `${this.value}${prefix}###${text}${postfix}`;
+        return this;
+    }
+
+    subheader(text: string, prefix = "", postfix = "") {
+        this.value = `${this.value}${prefix}##${text}${postfix}`;
+        return this;
+    }
+
+    underline(text: string | number | Markup, prefix = "", postfix = "") {
+        this.value = `${this.value}${prefix}__${text}__${postfix}`;
+        return this;
+    }
+
+    bold(text: string | number | Markup, prefix = "", postfix = "") {
+        this.value = `${this.value}${prefix}**${text}**${postfix}`;
+        return this;
+    }
+
+    italic(text: string | number | Markup, prefix = "", postfix = "") {
+        this.value = `${this.value}${prefix}*${text}*${postfix}`;
+        return this;
+    }
+
+    strike(text: string | number | Markup, prefix = "", postfix = "") {
+        this.value = `${this.value}${prefix}~~${text}~~${postfix}`;
+        return this;
+    }
+
+    copyable(text: string | number | Markup, prefix = "", postfix = "") {
+        this.value = `${this.value}${prefix}\`${text}\`${postfix}`;
+        return this;
+    }
+
+    link(text: string | number, link: string, prefix = "", postfix = "") {
+        this.value = `${this.value}${prefix}[${text}](${link})${postfix}`;
+        return this;
+    }
+
+    toString(): string {
+        return this.value;
+    }
+}
+
 async function wait(ms: number): Promise<void> {
     return new Promise<void>((resolve) => {
         setTimeout(resolve, ms);
     });
 }
-
-export default Bot;

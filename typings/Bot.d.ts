@@ -41,5 +41,28 @@ export declare class Bot {
     private handleMessage;
     private _getUpdates;
 }
-export default Bot;
+export declare class Markup {
+    private value;
+    constructor(value?: string);
+    static header(text: string | number | Markup, prefix?: string, postfix?: string): string;
+    static subheader(text: string | number | Markup, prefix?: string, postfix?: string): string;
+    static bold(text: string | number | Markup, prefix?: string, postfix?: string): string;
+    static underline(text: string | number | Markup, prefix?: string, postfix?: string): string;
+    static italic(text: string | number | Markup, prefix?: string, postfix?: string): string;
+    static strike(text: string | number | Markup, prefix?: string, postfix?: string): string;
+    static copyable(text: string | number | Markup, prefix?: string, postfix?: string): string;
+    static link(text: string | number | Markup, link: string, prefix?: string, postfix?: string): string;
+    clear(): void;
+    newLine(count?: number): this;
+    text(text: string | number, prefix?: string, postfix?: string): this;
+    header(text: string, prefix?: string, postfix?: string): this;
+    subheader(text: string, prefix?: string, postfix?: string): this;
+    underline(text: string | number | Markup, prefix?: string, postfix?: string): this;
+    bold(text: string | number | Markup, prefix?: string, postfix?: string): this;
+    italic(text: string | number | Markup, prefix?: string, postfix?: string): this;
+    strike(text: string | number | Markup, prefix?: string, postfix?: string): this;
+    copyable(text: string | number | Markup, prefix?: string, postfix?: string): this;
+    link(text: string | number, link: string, prefix?: string, postfix?: string): this;
+    toString(): string;
+}
 //# sourceMappingURL=Bot.d.ts.map
