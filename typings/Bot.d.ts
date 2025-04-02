@@ -1,5 +1,5 @@
 import { AxiosInstance } from "axios";
-import { ICommands, IReplyOption } from "../types/types";
+import { ICommands, IReplyButtons, IReplyOption } from "../types/types";
 /**
  * Represents the context of a message or update.
  */
@@ -15,6 +15,7 @@ export declare class Context {
     }, yoaiClient: YoAIClient);
     reply(text: string): Promise<void>;
     replyWithOptions(text: string, options?: IReplyOption[]): Promise<void>;
+    replyWithButtons(text: string, buttons?: IReplyButtons): Promise<void>;
     replyWithPhoto(photo: string): Promise<void>;
 }
 export declare class YoAIClient {
@@ -22,6 +23,7 @@ export declare class YoAIClient {
     constructor(token: string);
     sendMessage(to: string, text: string): Promise<void>;
     sendMessageWithOptions(to: string, text: string, options?: IReplyOption[]): Promise<void>;
+    sendMessageWithButtons(to: string, text: string, buttons?: IReplyButtons): Promise<void>;
     setCommands(commands: ICommands[]): Promise<void>;
     webhookURL(webhookURL: string): Promise<void>;
     getChannelMember(id: string, userId: string): Promise<void>;

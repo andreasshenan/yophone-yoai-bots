@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, CreateAxiosDefaults } from "axios";
 import fs from "fs";
 import FormData from "form-data";
-import { ICommands, IReplyOption } from "../types/types";
+import { ICommands, IReplyButtons, IReplyOption } from "../types/types";
 
 /**
  * Represents the context of a message or update.
@@ -38,6 +38,17 @@ export class Context {
         );
     }
 
+    async replyWithButtons(
+        text: string,
+        buttons: IReplyButtons = {}
+    ): Promise<void> {
+        return this.yoaiClient.sendMessageWithButtons(
+            this.sender.id,
+            text,
+            buttons
+        );
+    }
+
     replyWithPhoto(photo: string): Promise<void> {
         return this.yoaiClient.sendPhoto(this.sender.id, "photo", photo);
     }
@@ -66,6 +77,13 @@ export class YoAIClient {
         options: IReplyOption[] = []
     ): Promise<void> {
         await this.client.post("/sendMessage", { to, text, options });
+    }
+    async sendMessageWithButtons(
+        to: string,
+        text: string,
+        buttons: IReplyButtons = {}
+    ): Promise<void> {
+        await this.client.post("/sendMessage", { to, text, buttons });
     }
     async setCommands(commands: ICommands[]): Promise<void> {
         await this.client.post("/sendMessage", { commands });
