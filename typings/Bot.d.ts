@@ -6,11 +6,12 @@ import { ICommands, IReplyButtons, IReplyOption } from "../types/types";
 export declare class Context {
     update: any;
     content: string;
+    callbackData: string | null;
     sender: {
         id: string;
     };
     yoaiClient: YoAIClient;
-    constructor(update: any, content: string, sender: {
+    constructor(update: any, content: string, callbackData: string | null, sender: {
         id: string;
     }, yoaiClient: YoAIClient);
     reply(text: string): Promise<void>;
@@ -33,6 +34,7 @@ export declare class YoAIClient {
 export declare class Bot {
     middlewares: Array<(ctx: Context, next: () => Promise<void>) => Promise<void>>;
     yoaiClient: YoAIClient;
+    activeCommands: string[];
     constructor(token: string);
     command(command: string, handler: (ctx: Context) => Promise<void>): void;
     on(event: string, handler: (ctx: Context) => Promise<void>): void;

@@ -9,17 +9,20 @@ import { ICommands, IReplyButtons, IReplyOption } from "../types/types";
 export class Context {
     update: any;
     content: string;
+    callbackData: string | null;
     sender: { id: string };
     yoaiClient: YoAIClient;
 
     constructor(
         update: any,
         content: string,
+        callbackData: string | null,
         sender: { id: string },
         yoaiClient: YoAIClient
     ) {
         this.update = update;
         this.content = content || "";
+        this.callbackData = callbackData;
         this.sender = sender;
         this.yoaiClient = yoaiClient;
     }
@@ -123,35 +126,50 @@ export class Bot {
         (ctx: Context, next: () => Promise<void>) => Promise<void>
     >;
     yoaiClient: YoAIClient;
+    activeCommands: string[];
 
     constructor(token: string) {
         this.middlewares = [];
         this.yoaiClient = new YoAIClient(token);
+        this.activeCommands = [];
     }
 
     command(command: string, handler: (ctx: Context) => Promise<void>): void {
+        this.activeCommands.push(command);
         this.middlewares.push(async (ctx, next) => {
             if (ctx.content.startsWith("/")) {
                 const commandName = ctx.content.substring(1).trim();
                 if (command === commandName) {
                     await handler(ctx);
-                    await next();
-                } else {
-                    await next();
+                    return next();
                 }
-            } else {
-                await next();
             }
+            return next();
         });
     }
 
     on(event: string, handler: (ctx: Context) => Promise<void>): void {
         this.middlewares.push(async (ctx, next) => {
-            if (ctx.content && !ctx.content.startsWith("/")) {
-                await handler(ctx);
-                await next();
+            const { callbackData } = ctx;
+            if (event === "message" && !callbackData) {
+                if (ctx.content) {
+                    if (!ctx.content.startsWith("/")) {
+                        await handler(ctx);
+                        return next();
+                    } else {
+                        const commandName = ctx.content.substring(1).trim();
+                        if (!this.activeCommands.includes(commandName)) {
+                            await handler(ctx);
+                            return next();
+                        }
+                    }
+                }
             }
-            await next();
+            if (event === "callbackData" && callbackData) {
+                await handler(ctx);
+                return next();
+            }
+            return next();
         });
     }
 
@@ -180,8 +198,11 @@ export class Bot {
     }
 
     private async handleMessage(update: any): Promise<void> {
-        const { text, sender } = update;
+        const { text, sender, callbackData } = update;
         let messageTextReceived = Buffer.from(text, "base64").toString("utf-8");
+        let callbackDataReceived = Buffer.from(callbackData, "base64").toString(
+            "utf-8"
+        );
 
         try {
             const decodedData = JSON.parse(messageTextReceived);
@@ -190,9 +211,20 @@ export class Bot {
             console.log("Received plain text", messageTextReceived);
         }
 
+        try {
+            const decodedData = JSON.parse(callbackDataReceived);
+            callbackDataReceived = decodedData.content.content;
+        } catch (e) {
+            console.log(
+                "Received plain text in callbackData",
+                callbackDataReceived
+            );
+        }
+
         const ctx = new Context(
             update,
             messageTextReceived,
+            callbackDataReceived,
             sender,
             this.yoaiClient
         );
