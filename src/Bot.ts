@@ -138,7 +138,10 @@ export class Bot {
         this.activeCommands.push(command);
         this.middlewares.push(async (ctx, next) => {
             if (ctx.content.startsWith("/")) {
-                const commandName = ctx.content.substring(1).trim();
+                const commandName = ctx.content
+                    .substring(1)
+                    .trim()
+                    .split(" ")[0];
                 if (command === commandName) {
                     await handler(ctx);
                     return next();
@@ -161,7 +164,10 @@ export class Bot {
                         await handler(ctx);
                         return next();
                     } else {
-                        const commandName = ctx.content.substring(1).trim();
+                        const commandName = ctx.content
+                            .substring(1)
+                            .trim()
+                            .split(" ")[0];
                         if (!this.activeCommands.includes(commandName)) {
                             await handler(ctx);
                             return next();
