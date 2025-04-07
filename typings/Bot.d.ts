@@ -37,6 +37,7 @@ export declare class Bot {
     activeCommands: string[];
     constructor(token: string);
     command(command: string, handler: (ctx: Context) => Promise<void>): void;
+    setCommands(commands: ICommands[]): Promise<void>;
     on(event: string, handler: (ctx: Context) => Promise<void>): void;
     start(): void;
     setWebhook(): void;

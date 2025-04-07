@@ -148,6 +148,10 @@ export class Bot {
         });
     }
 
+    async setCommands(commands: ICommands[]): Promise<void> {
+        await this.yoaiClient.setCommands(commands);
+    }
+
     on(event: string, handler: (ctx: Context) => Promise<void>): void {
         this.middlewares.push(async (ctx, next) => {
             const { callbackData } = ctx;
