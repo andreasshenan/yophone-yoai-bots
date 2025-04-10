@@ -52,6 +52,14 @@ export class Context {
         );
     }
 
+    async replyWithMediaURLs(text: string, mediaURLs: string[]): Promise<void> {
+        return this.yoaiClient.sendMessageWithMediaURLs(
+            this.sender.id,
+            text,
+            mediaURLs
+        );
+    }
+
     replyWithPhoto(photo: string): Promise<void> {
         return this.yoaiClient.sendPhoto(this.sender.id, "photo", photo);
     }
@@ -88,6 +96,14 @@ export class YoAIClient {
     ): Promise<void> {
         await this.client.post("/sendMessage", { to, text, buttons });
     }
+    async sendMessageWithMediaURLs(
+        to: string,
+        text: string,
+        mediaURLs: string[] = []
+    ): Promise<void> {
+        await this.client.post("/sendMessage", { to, text, mediaURLs });
+    }
+
     async setCommands(commands: ICommands[]): Promise<void> {
         await this.client.post("/sendMessage", { commands });
     }
@@ -106,7 +122,6 @@ export class YoAIClient {
         const formdata = new FormData();
         formdata.append("to", to);
         formdata.append("text", text);
-        console.log(fileBuffer);
         formdata.append("file", fs.createReadStream(photo), photo);
 
         await this.client.post("/sendMessage", formdata, {
@@ -244,7 +259,6 @@ export class Bot {
     private async _getUpdates(): Promise<void> {
         try {
             const data = await this.yoaiClient.getUpdates();
-            console.log("Status code", data.status);
 
             if (data.status === 200) {
                 data.data.data.forEach((m: any) => {

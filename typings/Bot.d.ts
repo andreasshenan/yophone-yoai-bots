@@ -17,6 +17,7 @@ export declare class Context {
     reply(text: string): Promise<void>;
     replyWithOptions(text: string, options?: IReplyOption[]): Promise<void>;
     replyWithButtons(text: string, buttons?: IReplyButtons): Promise<void>;
+    replyWithMediaURLs(text: string, mediaURLs: string[]): Promise<void>;
     replyWithPhoto(photo: string): Promise<void>;
 }
 export declare class YoAIClient {
@@ -25,6 +26,7 @@ export declare class YoAIClient {
     sendMessage(to: string, text: string): Promise<void>;
     sendMessageWithOptions(to: string, text: string, options?: IReplyOption[]): Promise<void>;
     sendMessageWithButtons(to: string, text: string, buttons?: IReplyButtons): Promise<void>;
+    sendMessageWithMediaURLs(to: string, text: string, mediaURLs?: string[]): Promise<void>;
     setCommands(commands: ICommands[]): Promise<void>;
     webhookURL(webhookURL: string): Promise<void>;
     getChannelMember(id: string, userId: string): Promise<void>;
